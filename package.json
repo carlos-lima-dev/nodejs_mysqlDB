@@ -1,0 +1,26 @@
+{
+  "name": "nodemysql",
+  "version": "1.0.0",
+  "description": "projeto node mysql",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "mysql"
+  ],
+  "author": "Carlos Lima",
+  "license": "ISC",
+  "dependencies": {
+    "bootstrap": "^5.3.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-fileupload": "^1.5.1",
+    "express-handlebars": "^8.0.1",
+    "mysql2": "^3.11.0",
+    "nodemon": "^3.1.4"
+  }
+}

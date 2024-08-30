@@ -1,0 +1,36 @@
+<main>
+  <div class="container">
+    <div class="row">
+      <div class="col-6 offset-3">
+        {{>mensagens}}
+        <form action="/update" method="post" enctype="multipart/form-data">
+          <img src="../imagens/{{product.imagem}}" alt="" />
+          <input type="hidden" name="codigo" value="{{product.codigo}}" />
+          <input type="hidden" name="productimage" value="{{product.imagem}}" />
+          <input
+            type="text"
+            name="nome"
+            class="form-control"
+            placeholder="Nome do produto"
+            value="{{product.nome}}"
+          />
+          <input
+            type="number"
+            name="valor"
+            class="form-control"
+            placeholder="Valor do produto"
+            value="{{product.valor}}"
+          />
+          <select name="categoria" class="form-control">
+            <option value="electronics" {{#condicionalIgualdade product.categoria '==' 'electronics'}}selected{{/condicionalIgualdade}}>Electronics</option>
+            <option value="vestuario" {{#condicionalIgualdade product.categoria '==' 'vestuario'}}selected{{/condicionalIgualdade}}>Vestuário</option>
+            <option value="alimenticio" {{#condicionalIgualdade product.categoria '==' 'alimenticio'}}selected{{/condicionalIgualdade}}>Alimentício</option>
+          </select>
+          <input type="file" name="imagem" class="form-control" />
+          <button type="submit" class="btn btn-primary">Editar</button>
+          <a href="/" class="btn btn-secondary">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>

@@ -1,0 +1,105 @@
+<main>
+  <!-- Container for messages and forms -->
+  <div class="container mt-4">
+    <!-- Messages -->
+    <div class="row">
+      <div class="col-12">
+        {{> mensagens}}
+      </div>
+    </div>
+    
+    <!-- Cadastrar Form -->
+    <div class="row mb-4">
+      <div class="col-md-6 offset-md-3">
+        <h2 class="text-center mb-4">Cadastrar Produto</h2>
+        <form action="/register" method="post" enctype="multipart/form-data" class="bg-light p-4 rounded shadow-sm">
+          <div class="form-group">
+            <label for="nome">Nome do produto</label>
+            <input
+              type="text"
+              id="nome"
+              name="nome"
+              class="form-control"
+              placeholder="Nome do produto"
+
+            />
+          </div>
+          <div class="form-group">
+            <label for="valor">Valor do produto</label>
+            <input
+              type="number"
+              id="valor"
+              name="valor"
+              class="form-control"
+              placeholder="Valor do produto"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="imagem">Imagem do produto</label>
+            <input
+              type="file"
+              id="imagem"
+              name="imagem"
+              class="form-control-file"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="categoria">Categoria</label>
+            <select name="categoria" id="categoria" class="form-control" required>
+              <option value="electronics">Electronics</option>
+              <option value="vestuario">Vestuário</option>
+              <option value="alimenticio">Alimentício</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Filter Form -->
+    <div class="row mb-4">
+      <div class="col-md-6 offset-md-3">
+        <h2 class="text-center mb-4">Filtrar Produtos</h2>
+        <form action="/" method="get" class="form-inline justify-content-center">
+          <div class="form-group mr-2">
+            <select name="category" class="form-control">
+              <option value="">Todas as categorias</option>
+              <option value="electronics">Electronics</option>
+              <option value="vestuario">Vestuário</option>
+              <option value="alimenticio">Alimentício</option>
+            </select>
+          </div>
+          <div class="form-group mr-2">
+            <input
+              type="text"
+              name="search"
+              class="form-control"
+              placeholder="Buscar por nome"
+            />
+          </div>
+          <button type="submit" class="btn btn-primary">Filtrar</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Products List -->
+    <div class="row">
+      {{#each products}}
+        <div class="col-md-4 mb-4">
+          <div class="card shadow-sm">
+            <img src="../images/{{imagem}}" class="card-img-top" alt="{{nome}}">
+            <div class="card-body">
+              <h5 class="card-title">{{nome}}</h5>
+              <p class="card-text">{{valor}}€</p>
+              <p class="card-text">{{category}}</p>
+              <a href="/updateform/{{codigo}}" class="btn btn-warning btn-block">Alterar</a>
+              <a href="/remove/{{codigo}}&{{imagem}}" class="btn btn-danger btn-block mt-2">Remover</a>
+            </div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</main>

@@ -1,43 +1,20 @@
-const express = require("express");
-const router = express.Router();
-const mysql = require("mysql2/promise");
 const path = require("path");
 const fs = require("fs");
-const dbConfig = require("../config/db");
+const productService = require("../services/productService");
 
-const getDbConnection = async () => {
+const getProducts = async (req, res, next) => {
+  const {category, search, situacao} = req.query;
+
   try {
-    return await mysql.createConnection(dbConfig);
+    const products = await productService.getProducts(category, search);
+    res.render("home", {products, situacao});
   } catch (error) {
-    console.error("Error creating database connection:", error);
-    throw error;
+    console.error("Database query error:", error);
+    next(error);
   }
 };
 
-router.get("/", async (req, res, next) => {
-  const {category, search, situacao} = req.query;
-  let sql = "SELECT * FROM products";
-  let conditions = [];
-
-  if (category) conditions.push(`category = ?`);
-  if (search) conditions.push(`nome LIKE ?`);
-
-  if (conditions.length) sql += " WHERE " + conditions.join(" AND ");
-
-  try {
-    const db = await getDbConnection();
-    const [results] = await db.query(sql, [
-      category || null,
-      search ? `%${search}%` : null,
-    ]);
-    res.render("home", {products: results, situacao});
-  } catch (error) {
-    console.error("Database query error:", error); // Log error details
-    next(error);
-  }
-});
-
-router.post("/register", async (req, res, next) => {
+const registerProduct = async (req, res, next) => {
   try {
     const {nome, valor, categoria} = req.body;
     const imagem = req.files?.imagem;
@@ -49,24 +26,19 @@ router.post("/register", async (req, res, next) => {
     const imagePath = path.join(__dirname, "../images", imagem.name);
     await imagem.mv(imagePath);
 
-    const db = await getDbConnection();
-    await db.query(
-      "INSERT INTO products (nome, valor, imagem, category) VALUES (?, ?, ?, ?)",
-      [nome, valor, imagem.name, categoria]
-    );
+    await productService.registerProduct(nome, valor, imagem.name, categoria);
 
     res.redirect("/?situacao=okCadastro");
   } catch (error) {
     next(error);
   }
-});
+};
 
-router.get("/remove/:codigo&:imagem", async (req, res, next) => {
+const removeProduct = async (req, res, next) => {
   try {
     const {codigo, imagem} = req.params;
 
-    const db = await getDbConnection();
-    await db.query("DELETE FROM products WHERE codigo = ?", [codigo]);
+    await productService.removeProduct(codigo);
 
     const imagePath = path.join(__dirname, "../images", imagem);
     fs.unlink(imagePath, (err) => {
@@ -77,33 +49,26 @@ router.get("/remove/:codigo&:imagem", async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-});
+};
 
-router.get("/updateform/:codigo", async (req, res, next) => {
+const getUpdateForm = async (req, res, next) => {
   try {
     const {codigo} = req.params;
+    const product = await productService.getProductByCode(codigo);
 
-    const db = await getDbConnection();
-    const [results] = await db.query(
-      "SELECT * FROM products WHERE codigo = ?",
-      [codigo]
-    );
-
-    res.render("editform", {product: results[0]});
+    res.render("editform", {product});
   } catch (error) {
     next(error);
   }
-});
+};
 
-router.post("/update", async (req, res, next) => {
+const updateProduct = async (req, res, next) => {
   try {
     const {codigo, nome, valor, categoria, productimage} = req.body;
 
     if (!nome || !valor || isNaN(valor)) {
       return res.redirect("/?situacao=falhaEdicao");
     }
-
-    const db = await getDbConnection();
 
     if (req.files && req.files.imagem) {
       const imagem = req.files.imagem;
@@ -114,21 +79,27 @@ router.post("/update", async (req, res, next) => {
         if (err) console.log("Erro ao eliminar a imagem antiga.");
       });
 
-      await db.query(
-        "UPDATE products SET nome = ?, valor = ?, imagem = ?, category = ? WHERE codigo = ?",
-        [nome, valor, imagem.name, categoria, codigo]
+      await productService.updateProduct(
+        codigo,
+        nome,
+        valor,
+        categoria,
+        imagem.name
       );
     } else {
-      await db.query(
-        "UPDATE products SET nome = ?, valor = ?, category = ? WHERE codigo = ?",
-        [nome, valor, categoria, codigo]
-      );
+      await productService.updateProduct(codigo, nome, valor, categoria);
     }
 
     res.redirect("/?situacao=okEdicao");
   } catch (error) {
     next(error);
   }
-});
+};
 
-module.exports = router;
+module.exports = {
+  getProducts,
+  registerProduct,
+  removeProduct,
+  getUpdateForm,
+  updateProduct,
+};

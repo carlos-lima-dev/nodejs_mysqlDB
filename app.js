@@ -3,7 +3,7 @@ const {engine} = require("express-handlebars");
 const fileUpload = require("express-fileupload");
 const path = require("path");
 const app = express();
-const productController = require("./controllers/productController");
+const productRoutes = require("./routes/productRoutes");
 const errorHandler = require("./middlewares/errorHandler");
 
 app.use(
@@ -48,7 +48,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 
-app.use("/", productController);
+app.use("/", productRoutes);
 
 // Error handler middleware
 app.use(errorHandler);

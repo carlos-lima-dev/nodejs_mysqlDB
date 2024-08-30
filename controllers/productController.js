@@ -6,7 +6,12 @@ const fs = require("fs");
 const dbConfig = require("../config/db");
 
 const getDbConnection = async () => {
-  return mysql.createConnection(dbConfig);
+  try {
+    return await mysql.createConnection(dbConfig);
+  } catch (error) {
+    console.error("Error creating database connection:", error);
+    throw error;
+  }
 };
 
 router.get("/", async (req, res, next) => {
@@ -27,6 +32,7 @@ router.get("/", async (req, res, next) => {
     ]);
     res.render("home", {products: results, situacao});
   } catch (error) {
+    console.error("Database query error:", error); // Log error details
     next(error);
   }
 });
